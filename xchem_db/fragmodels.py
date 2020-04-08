@@ -20,16 +20,20 @@ class Target(models.Model):
         target_name = models.CharField(max_length=255, unique=True, db_index=True) # must be unique!!
         aa_sequence = models.CharField(max_length=10000, unique=True, db_index=True) # how to set max length? 
         reference_pdbs = [] # may be more than one - how to handle?
-        hits = [] # link to compounds
-        misses = [] # link to compounds
-        bound_pdbs = [] # pdb files of hits in bound state
+        hits = models.ManyToManyField('Compound') # link to compounds
+        misses = models.ManyToManyField('Compound') # link to compounds
+        bound_pdbs = models.ManyToManyField('Crystal') # pdb files of hits in bound state
 
 
 class Compound(models.Model):
+	# some sort of code - Enamine code name? 
         smiles = models.CharField(max_length=255, unique=True, db_index=True) # canonicalised!! must be unique!!
         inchi = None # how do I store this information ?? 
         DSiP = models.BooleanField(default=False)
         DSPL = models.BooleanField(default=False)
+	hits = models.ManyToManyField('Target') # link to target hits
+	misses = models.ManyToManyField('Target') # link to target hits
+	bound_pdbs = models.ManyToManyField('Crystal') # link to bound pdb files
 
 class Crystal(models.Model):
         # do I need a crystal name?
@@ -56,7 +60,7 @@ class Outcome(models.Model):
                 ('6', 'deposited')
                 ]
         outcome = models.Charfield(max_length=1, choices=OUTCOME_CHOICES, default='0')
-        hit = models.BooleanField(default=False)
+        hit = models.BooleanField(default=False) # how to define hit? outcome, or if bound pdb exists?
 
 
 
